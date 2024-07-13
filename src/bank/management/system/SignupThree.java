@@ -6,17 +6,22 @@ package bank.management.system;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 /**
  *
  * @author bheke
  */
-public class SignupThree extends JFrame{
+public class SignupThree extends JFrame implements ActionListener{
     
+    String formno;
     JRadioButton r1, r2, r3, r4;
     JButton submit, cancel;
     JCheckBox c1, c2, c3, c4, c5, c6, c7;
     
-    SignupThree(){
+    SignupThree(String formno){
+        
+        this.formno = formno;
         
         setLayout(null);
         
@@ -143,6 +148,7 @@ public class SignupThree extends JFrame{
         submit.setFont(new Font("Raleway", Font.BOLD, 14));
         submit.setBounds(250, 720, 100, 30);
         add(submit);
+        submit.addActionListener(this);
         
         cancel = new JButton("Cancel");
         cancel.setBackground(Color.BLACK);
@@ -150,6 +156,7 @@ public class SignupThree extends JFrame{
         cancel.setFont(new Font("Raleway", Font.BOLD, 14));
         cancel.setBounds(420, 720, 100, 30);
         add(cancel);
+        cancel.addActionListener(this);
         
         getContentPane().setBackground(Color.WHITE);
         
@@ -158,8 +165,83 @@ public class SignupThree extends JFrame{
         setVisible(true);
         
     }
-    
+    public void actionPerformed(ActionEvent ae){
+        if(ae.getSource() == submit){
+            
+            String accountType = null;
+            if(r1.isSelected()){
+                accountType = "Saving Account";
+            }
+            else if(r2.isSelected()){
+                accountType = "Fixed Deposit Account";
+            }
+            else if(r3.isSelected()){
+                accountType = "Current Account";
+            }
+            else if(r4.isSelected()){
+                accountType = "Reccurring Deposit Account";
+            }
+            
+            Random random = new Random();
+            String cardNumber = "" + (Math.abs((random.nextLong() % 1000000000L)) + 5040936000000000L);
+            String pinNumber = "" + (Math.abs((random.nextLong() % 1000L)) + 1000L);
+
+            String facility = "";
+            if(c1.isSelected()){
+                facility = facility + " ATM Card";
+            }
+            if(c2.isSelected()){
+                facility = facility + " Internet Banking";
+            }
+            if(c3.isSelected()){
+                facility = facility + " Mobile Banking";
+            }
+            if(c4.isSelected()){
+                facility = facility + " Email & SMS Alerts";
+            }
+            if(c5.isSelected()){
+                facility = facility + " Cheque Book";
+            }
+            if(c6.isSelected()){
+                facility = facility + " E-Statement";
+            }
+           
+            try{
+                if(accountType.equals("")){
+                    JOptionPane.showMessageDialog(null, "Account type is Required");
+                }
+                else if(facility.equals("")){
+                    JOptionPane.showMessageDialog(null, "At least one Service is Required");
+                }
+                else{
+                    if(c7.isSelected()){
+                        Conn c = new Conn();
+                        String query = "insert into signUpThree values('"+formno+"', '"+accountType+"', '"+cardNumber+"', '"+pinNumber+"', '"+facility+"')";
+                        String query2 = "insert into Login values('"+formno+"', '"+cardNumber+"', '"+pinNumber+"')";
+                        c.s.executeUpdate(query);
+                        c.s.executeUpdate(query2);
+                    
+                        JOptionPane.showMessageDialog(null, "Card Number: " + cardNumber + "\n Pin: " + pinNumber);
+                
+                        setVisible(false);
+                        new Deposit(pinNumber).setVisible(true);
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "Please acknowledge");
+                    }
+                    
+                }
+            }
+            catch(Exception e){
+                System.out.println(e);
+            }
+        }
+        else if(ae.getSource() == cancel){
+            setVisible(false);
+            new Login().setVisible(true);
+        }
+    }
     public static void main(String args[]){
-        new SignupThree();
+        new SignupThree("");
     }
 }

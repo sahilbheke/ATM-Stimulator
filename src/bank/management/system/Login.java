@@ -7,6 +7,7 @@ package bank.management.system;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*; 
+import java.sql.*;
 /**
  *
  * @author bheke
@@ -91,15 +92,34 @@ public class Login extends JFrame implements ActionListener{
     }
     
     public void actionPerformed(ActionEvent ae){
-        if(ae.getSource() == login){
-            
-            
-        }else if(ae.getSource() == clear){
+        
+        if(ae.getSource() == clear){
             
             cardTextField.setText("");
             pinTextField.setText("");
             
-        }else if(ae.getSource() == signup){
+        }
+        else if(ae.getSource() == login){
+            Conn c = new Conn();
+            String cardNumber = cardTextField.getText();
+            String pinNumber = pinTextField.getText();
+            
+            String query = "Select * from login where Card_Number = '"+cardNumber+"' and Pin_Number = '"+pinNumber+"'";
+            try{
+                ResultSet rs = c.s.executeQuery(query);
+                System.out.print(rs);
+                if(rs.next()){
+                    setVisible(false);
+                    new Transaction(pinNumber).setVisible(true);
+                }else{
+                    JOptionPane.showMessageDialog(null, "Incorrenct Credentials");
+                }
+            }
+            catch(Exception e){
+                System.out.print(e);
+            }
+        }
+        else if(ae.getSource() == signup){
             setVisible(false);
             new SignupOne().setVisible(true);
         }
